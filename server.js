@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(express.json({ limit: "2mb" }));
@@ -88,5 +89,22 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const distPath = path.join(__dirname, "dist");
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+}
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Sensei backend running on http://localhost:${PORT} (provider: ${PROVIDER})`));
+
+
